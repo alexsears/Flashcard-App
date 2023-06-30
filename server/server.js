@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const dbUser = encodeURIComponent(process.env.DB_USERNAME);
 const dbPassword = encodeURIComponent(process.env.DB_PASSWORD);
@@ -33,5 +34,5 @@ server.use('/signup', signupRoutes);
 server.use('/flashcards', flashcardsRoutes);
 server.use('/review', reviewRoutes);
 
-const port = 5000;
+const port = 3000;
 server.listen(port, () => console.log(`Server running on port ${port}`));

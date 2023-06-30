@@ -8,7 +8,7 @@ function FlashcardList({ userId }) {
 
   useEffect(() => {
     if (userId) {
-      fetch(`http://localhost:5000/flashcards?userId=${userId}`)
+      fetch(`http://localhost:3000/flashcards?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
           setFlashcards(data);
@@ -34,7 +34,7 @@ function FlashcardList({ userId }) {
   };
 
   const submitReview = (reviewResult) => {
-    fetch('http://localhost:5000/review', {
+    fetch('http://localhost:3000/review', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

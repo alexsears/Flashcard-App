@@ -19,8 +19,19 @@ module.exports = {
       // ... other rules
 
       {
+        test: /\/node_modules\/@firebase\/installations\/node_modules\/idb\/build\/index\.js$/,
+        use: 'null-loader'
+      },
+      {
+        test: /\/node_modules\/@firebase\/installations\/node_modules\/idb\/.*\.js$/,
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+        }
+      },
+      {
         test: /\.js$/,
-        exclude: /node_modules/,
+        exclude: /node_modules\/(?!@firebase\/installations\/node_modules\/idb)/,
         use: {
           loader: 'babel-loader',
           options: {

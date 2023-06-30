@@ -29,10 +29,10 @@ function App() {
   return (
     <div className="App">
       {currentUser ? (
-        <>
+        <div>
           <LogoutButton />
           <FlashcardList userId={currentUser.uid} /> {/* Pass userId to FlashcardList */}
-        </>
+        </div>
       ) : (
         <FirebaseAuth />
       )}
