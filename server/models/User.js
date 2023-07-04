@@ -19,6 +19,6 @@ const UserSchema = new Schema({
     createdAt: 'dateCreated',
     updatedAt: 'dateUpdated'
   }
-});
+}, { collection: 'users' });
 
 module.exports = mongoose.model('User', UserSchema);

@@ -12,7 +12,7 @@ const learningSchema = new mongoose.Schema({
   easeFactor: Number,
   lastReviewDate: Date,
   nextReviewDate: Date,
-}, { collection: 'progress' });
+}, { collection: 'LearningProgress' });
 
 
 module.exports = mongoose.model('LearningProgress', learningSchema);
