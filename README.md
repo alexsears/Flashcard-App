@@ -1,11 +1,11 @@
 ## Available Scripts
 
-In the server directory, you can run:
+In the server directory, run:
 
-### `npm start`
+`npm start`
 
 In the main project folder, run:
 
-### `npm start`
+`npm start`
 
 Runs the app in the development mode.\
