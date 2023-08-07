@@ -23,21 +23,17 @@ Prerequisites
 You need to have Node.js and npm installed on your machine. This project was built using Node.js version 14.17.0 and npm version 6.14.13.
 
 Installation
+
 Clone the repository:
-bash
-Copy code
 git clone https://github.com/<your-github-username>/flashcard-app.git
+
 Change your directory to the cloned repository:
-bash
-Copy code
 cd flashcard-app
+
 Install all the necessary packages:
-bash
-Copy code
 npm install
+
 Start the application:
-bash
-Copy code
 npm start
 The application should now be running on http://localhost:3000.
 
