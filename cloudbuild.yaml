@@ -1,0 +1,25 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', 
+           '--build-arg', 'REACT_APP_FIREBASE_API_KEY=${_REACT_APP_FIREBASE_API_KEY}',
+           '--build-arg', 'REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${_REACT_APP_FIREBASE_MESSAGING_SENDER_ID}',
+           '--build-arg', 'REACT_APP_FIREBASE_APP_ID=${_REACT_APP_FIREBASE_APP_ID}',
+           '--build-arg', 'REACT_APP_FIREBASE_MEASUREMENT_ID=${_REACT_APP_FIREBASE_MEASUREMENT_ID}',
+           '--build-arg', 'REACT_APP_FIREBASE_PROJECT_ID=${_REACT_APP_FIREBASE_PROJECT_ID}',
+           '-t', 'gcr.io/pootcuppeelek/server', 
+           '.']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy server \
+          --image gcr.io/pootcuppeelek/server \
+          --region us-south1 \
+          --platform managed \
+          --set-env-vars-file .env.production \
+          --allow-unauthenticated
+
+images:
+  - 'gcr.io/pootcuppeelek/server'

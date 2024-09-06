@@ -1,0 +1,519 @@
+/* Global Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #f0f2f5;
+  }
+  
+  .App > * {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Container (for centered content) */
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* Top Bar Styles */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .left-section, .right-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #007BFF;
+    margin-right: 20px;
+  }
+  
+  nav {
+    display: flex;
+    gap: 20px;
+  }
+  
+  nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  nav a:hover {
+    color: #f0f0f0;
+  }
+  
+  .right-section {
+    gap: 20px;
+  }
+  
+  /* Score Container */
+  .score-container {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+  }
+  
+  /* Logout Button */
+  .logout-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-left: 20px;
+  }
+  
+  .logout-button:hover {
+    background-color: #c82333;
+  }
+  
+  /* Flashcard Styles */
+  .flashcard-container {
+    width: 90%;
+    max-width: 600px;
+    height: 70vh;
+    min-height: 400px;
+    margin: 20px auto;
+    perspective: 1000px;
+    position: relative;
+  }
+  
+  @media (min-width: 768px) {
+    .flashcard-container {
+      width: 70%;
+      max-width: 800px;
+    }
+  }
+  
+  .flashcard-content {
+    font-size: 4vw;
+    max-height: 80%;
+    overflow: auto;
+  }
+  
+  @media (min-width: 768px) {
+    .flashcard-content {
+      font-size: 3vw;
+    }
+  }
+  
+  
+/*  
+  .flashcard-container:hover {
+    transform: translateY(-5px) scale(1.02);
+  }
+*/
+
+/* If you want to keep a subtle effect, you can use a smaller scale or just a shadow */
+.flashcard-container:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+  .flashcard-question,
+  .flashcard-answer {
+    background: linear-gradient(to right, 
+      rgba(139,0,0,0.05) 0%, 
+      white 10%, 
+      white 90%, 
+      rgba(0,100,0,0.05) 100%
+    );
+    font-size: 8vw;
+    font-weight: 500;
+  }
+  .flashcard-container.correct,
+  .flashcard-container.incorrect {
+    animation: slideOut 2s forwards;
+  }
+  
+  @keyframes slideOut {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(100vw + 100%)); }
+  }
+  
+  .flashcard-flipper {
+    transition: all 0.6s ease-out;
+    transform-style: preserve-3d;
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .flashcard-question,
+  .flashcard-answer {
+    backface-visibility: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    font-size: 12vw;
+    text-align: center;
+    padding: 30px;
+    box-sizing: border-box;
+    border-radius: 20px;
+    background: linear-gradient(to right, #8B0000 0%, #8B0000 5%, #f8f9fa 15%, #f8f9fa 85%, #006400 95%, #006400 100%);
+  }
+  
+  .flashcard-question {
+    transform: rotateY(0deg);
+  }
+  
+  .flashcard-answer {
+    transform: rotateY(180deg);
+  }
+  
+  .is-flipped .flashcard-flipper {
+    transform: rotateY(180deg);
+  }
+  
+  .play-button {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .play-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Authentication Form Styles */
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 400px;
+    width: 100%;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .label {
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .input {
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  .input:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  }
+  .button {
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .button-signup:hover {
+    background-color: #0056b3;
+  }
+  
+  .button-google:hover {
+    background-color: #c23321;
+  }
+  
+  .button-signup {
+    background-color: #007BFF;
+  }
+  
+  .button-google {
+    background-color: #DB4437;
+  }
+  
+  .book-image {
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .top-bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    nav {
+      margin-top: 10px;
+    }
+  
+    .flashcard-container {
+      width: 95vw;
+      height: 60vh;
+    }
+  
+    .play-button {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+    }
+  }
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .left-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-image {
+    height: 60px;
+    width: auto;
+    margin-right: 20px;
+  }
+  
+  nav {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .right-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .score-container {
+    /* Styles for the score container */
+    background-color: transparent;
+    padding: 5px;
+    border-radius: 4px;
+  }
+  
+  /* Adjust the size of the SevenSegmentDisplay if needed */
+  .score-container > div {
+    transform: scale(0.7);
+    transform-origin: right center;
+  }
+  
+  @media (max-width: 768px) {
+    .top-bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .right-section {
+      align-self: flex-end;
+      margin-top: 10px;
+    }
+  
+    .score-container > div {
+      transform: scale(0.6);
+    }
+  }
+  
+  .flashcard-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+  }
+  
+  .flashcard-container {
+    width: 100%;
+    height: 70vh;
+    min-height: 400px;
+    perspective: 1000px;
+    position: relative;
+  }
+  
+  /* ... (other existing flashcard styles) ... */
+  
+  .playback-speed-control {
+    width: 60%;
+    max-width: 200px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .playback-speed-control label {
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 2px;
+  }
+  
+  .playback-speed-control input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    background: transparent;
+    height: 15px;
+  }
+  
+  .playback-speed-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    margin-top: -4px;
+  }
+  
+  .playback-speed-control input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 3px;
+    background: #ddd;
+    border-radius: 1.5px;
+  }
+  
+  .playback-speed-control input[type="range"]:focus {
+    outline: none;
+  }
+  
+  .playback-speed-control input[type="range"]:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  }
+  
+  @media (max-width: 768px) {
+    .flashcard-wrapper {
+      width: 95%;
+    }
+  
+    .playback-speed-control {
+      width: 80%;
+    }
+  }
+  .language-toggle-switch {
+    width: 100px; /* Adjusted container width */
+    height: 40px; /* Adjusted height */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    background-color: #f0f0f0; /* Light background */
+    border-radius: 20px; /* Rounded corners */
+    padding: 5px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1); /* Softer shadow */
+  }
+  
+  .toggle-slider {
+    width: 25px; /* Reduced size for the bubble */
+    height: 25px; /* Consistent size */
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow for 3D effect */
+    position: absolute;
+    top: 8px; /* Better vertical alignment */
+    transition: all 0.3s ease;
+    z-index: 1; /* Ensure slider is not behind the flags */
+  }
+  
+  .english-mode {
+    left: 5px; /* Adjusted for correct positioning */
+  }
+  
+  .thai-mode {
+    left: 60px; /* Adjusted for correct positioning */
+  }
+  
+  .flag-icon {
+    width: 30px; /* Flag size */
+    height: 30px;
+  }
+  
+  .usa-flag {
+    position: absolute;
+    left: 10px; /* Spacing from the left side */
+    top: 5px; /* Centered */
+  }
+  
+  .thai-flag {
+    position: absolute;
+    right: 10px; /* Spacing from the right side */
+    top: 5px; /* Centered */
+  }
+  
+  .language-toggle-switch img {
+    filter: none; /* Ensure flag color remains */
+  }
+  
+  /* Fix for black flag icon */
+  .flag-icon.black-flag {
+    filter: brightness(1); /* Ensure it's properly colored */
+  }
+  
+  /* Optional hover effect */
+  .language-toggle-switch img:hover {
+    filter: brightness(1.1);
+  }
+  

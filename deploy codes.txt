@@ -1,0 +1,19 @@
+Now, your deployment commands would be:
+
+For development:
+# In the root directory
+
+    npm run dev
+
+This will start both your React development server and your Express server concurrently.
+
+For production:
+# In the root directory
+
+    npm run deploy:prod
+
+This will build your React app, then change to the server directory and deploy to Google Cloud Run.
+
+
+
+npx concurrently "npm run start" "npm run start:server"

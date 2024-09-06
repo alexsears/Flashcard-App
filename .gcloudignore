@@ -1,0 +1,12 @@
+npm-debug.log
+# .env
+
+.git
+.gitignore
+#node_modules
+server/node_modules
+!src
+
+# Ignore docker-compose file
+docker-compose.yml
+
