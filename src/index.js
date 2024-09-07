@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+<<<<<<< HEAD
 import './styles.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -29,10 +30,16 @@ try {
 } catch (error) {
   console.error('Error initializing Firebase:', error);
 }
+=======
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+>>>>>>> 5c6fa5765b8595fd5a1ddf0afbc5a26c9d8a1080
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+<<<<<<< HEAD
     <ErrorBoundary>
       <App />
     </ErrorBoundary>
@@ -40,3 +47,13 @@ root.render(
 );
 
 reportWebVitals();
+=======
+    <App />
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+>>>>>>> 5c6fa5765b8595fd5a1ddf0afbc5a26c9d8a1080

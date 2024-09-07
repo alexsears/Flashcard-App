@@ -8,7 +8,7 @@ COPY functions/package*.json ./functions/
 
 # Install dependencies
 RUN npm ci
-RUN cd functions && npm ci
+RUN cd functions && npm install
 
 # Copy source files
 COPY . .
@@ -28,14 +28,13 @@ COPY --from=build /app/functions/package*.json ./functions/
 
 # Install production dependencies
 RUN npm ci --only=production
-RUN cd functions && npm ci --only=production
+RUN cd functions && npm install --only=production
+
+# Set NODE_ENV to production
+ENV NODE_ENV=production
 
 # Expose the port the app runs on
 EXPOSE 8080
 
 # Start the server
 CMD ["node", "functions/index.js"]
-
-
-
-

@@ -23,7 +23,7 @@ const getFlashcards = async (req, res) => {
     const dueCardsQuery = db.collectionGroup('LearningProgress')
       .where('firebaseUid', '==', firebaseUid)
       .where('nextReviewDate', '<=', currentDate)
-      .orderBy('nextReviewDate') // To fetch the oldest due cards first
+      .orderBy('nextReviewDate')
       .limit(limit);
 
     const dueCardsSnapshot = await dueCardsQuery.get();

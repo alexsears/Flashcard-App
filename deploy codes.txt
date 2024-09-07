@@ -17,3 +17,9 @@ This will build your React app, then change to the server directory and deploy t
 
 
 npx concurrently "npm run start" "npm run start:server"
+
+docker build --build-arg REACT_APP_FIREBASE_API_KEY=$REACT_APP_FIREBASE_API_KEY --build-arg REACT_APP_FIREBASE_MESSAGING_SENDER_ID=$REACT_APP_FIREBASE_MESSAGING_SENDER_ID --build-arg REACT_APP_FIREBASE_APP_ID=$REACT_APP_FIREBASE_APP_ID --build-arg REACT_APP_FIREBASE_MEASUREMENT_ID=$REACT_APP_FIREBASE_MEASUREMENT_ID --build-arg REACT_APP_FIREBASE_PROJECT_ID=$REACT_APP_FIREBASE_PROJECT_ID -t pootcup-app . && docker tag pootcup-app gcr.io/pootcuppeelek/pootcup-app && docker push gcr.io/pootcuppeelek/pootcup-app && gcloud run deploy pootcup-service --image gcr.io/pootcuppeelek/pootcup-app --platform managed --region us-south1 --allow-unauthenticated --set-env-vars FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID},FIREBASE_PRIVATE_KEY_BASE64=${FIREBASE_PRIVATE_KEY_BASE64},FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+
+docker build  --build-arg REACT_APP_FIREBASE_API_KEY=AIzaSyDLapizLTn_LCbx_dUHIMcwbDDtKd8PVrE   --build-arg REACT_APP_FIREBASE_PROJECT_ID=pootcuppeelek   --build-arg REACT_APP_FIREBASE_MESSAGING_SENDER_ID=696840761999   --build-arg REACT_APP_FIREBASE_APP_ID=1:696840761999:web:74a12cc8b34977650df6fa   --build-arg REACT_APP_FIREBASE_MEASUREMENT_ID=G-B4E9X1V3S5   -t gcr.io/pootcuppeelek/pootcup-app . 
+docker push gcr.io/pootcuppeelek/pootcup-app
+gcloud run deploy pootcup-service   --image gcr.io/pootcuppeelek/pootcup-app   --platform managed   --region us-south1   --allow-unauthenticated

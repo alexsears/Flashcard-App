@@ -63,14 +63,13 @@ const postReview = async (req, res) => {
     } else if (learningProgress.reviewCount === 2) {
       learningProgress.interval = 6;
     } else {
-      learningProgress.interval = Math.round(learningProgress.interval * learningProgress.easeFactor);
+      learningProgress.interval = Math.max(1, Math.round(learningProgress.interval * learningProgress.easeFactor));
     }
 
     // Update the next review date
     const nextReviewDate = new Date(now.toDate());
-    nextReviewDate.setDate(nextReviewDate.getDate() + learningProgress.interval);
+    nextReviewDate.setDate(nextReviewDate.getDate() + Math.max(1, learningProgress.interval));
     learningProgress.nextReviewDate = admin.firestore.Timestamp.fromDate(nextReviewDate);
-
     await learningProgressRef.update(learningProgress);
 
     console.log(`Updated learning progress for card ${flashcardId}:`, {

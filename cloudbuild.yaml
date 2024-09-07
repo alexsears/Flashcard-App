@@ -18,7 +18,7 @@ steps:
           --image gcr.io/pootcuppeelek/server \
           --region us-south1 \
           --platform managed \
-          --set-env-vars-file .env.production \
+          --set-env-vars-file .env \
           --allow-unauthenticated
 
 images:
