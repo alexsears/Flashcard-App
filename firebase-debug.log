@@ -1,0 +1,147 @@
+[debug] [2024-09-08T03:13:55.342Z] ----------------------------------------------------------------------
+[debug] [2024-09-08T03:13:55.353Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\asear\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions
+[debug] [2024-09-08T03:13:55.354Z] CLI Version:   13.15.0
+[debug] [2024-09-08T03:13:55.354Z] Platform:      win32
+[debug] [2024-09-08T03:13:55.354Z] Node Version:  v20.14.0
+[debug] [2024-09-08T03:13:55.355Z] Time:          Sat Sep 07 2024 22:13:55 GMT-0500 (Central Daylight Time)
+[debug] [2024-09-08T03:13:55.355Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-09-08T03:13:55.361Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2024-09-08T03:13:55.497Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-09-08T03:13:55.498Z] > authorizing via signed-in user (asears2@gmail.com)
+[debug] [2024-09-08T03:13:55.498Z] [iam] checking project pootcuppeelek for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2024-09-08T03:13:55.499Z] > refreshing access token with scopes: []
+[debug] [2024-09-08T03:13:55.500Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2024-09-08T03:13:55.500Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-09-08T03:13:55.637Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2024-09-08T03:13:55.638Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2024-09-08T03:13:55.690Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2024-09-08T03:13:55.690Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-09-08T03:13:55.697Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/pootcuppeelek:testIamPermissions [none]
+[debug] [2024-09-08T03:13:55.697Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/pootcuppeelek:testIamPermissions x-goog-quota-user=projects/pootcuppeelek
+[debug] [2024-09-08T03:13:55.697Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pootcuppeelek:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2024-09-08T03:13:55.884Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/pootcuppeelek:testIamPermissions 200
+[debug] [2024-09-08T03:13:55.884Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pootcuppeelek:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2024-09-08T03:13:55.884Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/pootcuppeelek/serviceAccounts/pootcuppeelek@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2024-09-08T03:13:55.884Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/pootcuppeelek/serviceAccounts/pootcuppeelek@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2024-09-08T03:13:56.087Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/pootcuppeelek/serviceAccounts/pootcuppeelek@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2024-09-08T03:13:56.087Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/pootcuppeelek/serviceAccounts/pootcuppeelek@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'pootcuppeelek'...
+[info] 
+[info] i  deploying functions 
+[debug] [2024-09-08T03:13:56.091Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/pootcuppeelek [none]
+[debug] [2024-09-08T03:13:56.340Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/pootcuppeelek 200
+[debug] [2024-09-08T03:13:56.340Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/pootcuppeelek {"projectId":"pootcuppeelek","projectNumber":"696840761999","displayName":"Pootcuppeelek","name":"projects/pootcuppeelek","resources":{"hostingSite":"pootcuppeelek","realtimeDatabaseInstance":"pootcuppeelek-default-rtdb"},"state":"ACTIVE","etag":"1_72084ca7-d899-4c51-a45e-221e7d8d90e0"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2024-09-08T03:13:56.343Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudfunctions.googleapis.com [none]
+[debug] [2024-09-08T03:13:56.343Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/pootcuppeelek
+[debug] [2024-09-08T03:13:56.344Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/runtimeconfig.googleapis.com [none]
+[debug] [2024-09-08T03:13:56.345Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/pootcuppeelek
+[debug] [2024-09-08T03:13:56.346Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudbuild.googleapis.com [none]
+[debug] [2024-09-08T03:13:56.346Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudbuild.googleapis.com x-goog-quota-user=projects/pootcuppeelek
+[debug] [2024-09-08T03:13:56.347Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/artifactregistry.googleapis.com [none]
+[debug] [2024-09-08T03:13:56.347Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/artifactregistry.googleapis.com x-goog-quota-user=projects/pootcuppeelek
+[debug] [2024-09-08T03:13:56.633Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/runtimeconfig.googleapis.com 200
+[debug] [2024-09-08T03:13:56.633Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2024-09-08T03:13:56.636Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudbuild.googleapis.com 200
+[debug] [2024-09-08T03:13:56.637Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudbuild.googleapis.com [omitted]
+[info] +  functions: required API cloudbuild.googleapis.com is enabled 
+[debug] [2024-09-08T03:13:56.639Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/artifactregistry.googleapis.com 200
+[debug] [2024-09-08T03:13:56.640Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/artifactregistry.googleapis.com [omitted]
+[info] +  artifactregistry: required API artifactregistry.googleapis.com is enabled 
+[debug] [2024-09-08T03:13:56.664Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudfunctions.googleapis.com 200
+[debug] [2024-09-08T03:13:56.664Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/pootcuppeelek/services/cloudfunctions.googleapis.com [omitted]
+[info] +  functions: required API cloudfunctions.googleapis.com is enabled 
+[debug] [2024-09-08T03:13:56.664Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/pootcuppeelek/adminSdkConfig [none]
+[debug] [2024-09-08T03:13:56.815Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/pootcuppeelek/adminSdkConfig 200
+[debug] [2024-09-08T03:13:56.815Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/pootcuppeelek/adminSdkConfig {"projectId":"pootcuppeelek","databaseURL":"https://pootcuppeelek-default-rtdb.firebaseio.com","storageBucket":"pootcuppeelek.appspot.com"}
+[debug] [2024-09-08T03:13:56.816Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/pootcuppeelek/configs [none]
+[debug] [2024-09-08T03:13:57.048Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/pootcuppeelek/configs 200
+[debug] [2024-09-08T03:13:57.048Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/pootcuppeelek/configs {}
+[debug] [2024-09-08T03:13:57.051Z] Validating nodejs source
+[warn] !  functions: Runtime Node.js 16 was deprecated on 2024-01-30 and will be decommissioned on 2025-01-30, after which you will not be able to deploy without upgrading. Consider upgrading now to avoid disruption. See https://cloud.google.com/functions/docs/runtime-support for full details on the lifecycle policy 
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2024-09-08T03:13:58.325Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "16"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "private": true
+}
+[debug] [2024-09-08T03:13:58.326Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2024-09-08T03:13:58.328Z] Could not find functions.yaml. Must use http discovery
+[debug] [2024-09-08T03:13:58.343Z] Found firebase-functions binary at 'C:\code\pootcup\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8900
+
+[info] Node environment: development
+
+[info] FIREBASE_PROJECT_ID: pootcuppeelek
+FIREBASE_CLIENT_EMAIL: firebase-adminsdk-ph4el@pootcuppeelek.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY_BASE64 is set: true
+FIREBASE_CONFIG is set: true
+
+[info] Private key decoded successfully
+
+[info] Firebase Admin SDK initialized successfully
+
+[error] node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8900
+    at Server.setupListenHandle [as _listen2] (node:net:1898:16)
+    at listenInCluster (node:net:1946:12)
+    at Server.listen (node:net:2044:7)
+    at Function.listen (C:\code\pootcup\functions\node_modules\express\lib\application.js:635:24)
+    at Object.<anonymous> (C:\code\pootcup\functions\index.js:111:7)
+    at Module._compile (node:internal/modules/cjs/loader:1358:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1416:10)
+    at Module.load (node:internal/modules/cjs/loader:1208:32)
+    at Module._load (node:internal/modules/cjs/loader:1024:12)
+    at Module.require (node:internal/modules/cjs/loader:1233:19)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1925:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 8900
+}
+
+Node.js v20.14.0
+
+[debug] [2024-09-08T03:13:59.731Z] Failed to call quitquitquit. This often means the server failed to start request to http://localhost:8900/__/quitquitquit failed, reason:  {"message":"request to http://localhost:8900/__/quitquitquit failed, reason: ","type":"system","errno":"ECONNREFUSED","code":"ECONNREFUSED"}
+[debug] [2024-09-08T03:13:59.838Z] FetchError: request to http://127.0.0.1:8900/__/functions.yaml failed, reason: read ECONNRESET
+    at ClientRequest.<anonymous> (C:\Users\asear\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\node-fetch\lib\index.js:1501:11)
+    at ClientRequest.emit (node:events:519:28)
+    at ClientRequest.emit (node:domain:488:12)
+    at Socket.socketErrorListener (node:_http_client:500:9)
+    at Socket.emit (node:events:519:28)
+    at Socket.emit (node:domain:488:12)
+    at emitErrorNT (node:internal/streams/destroy:169:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:128:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+[error] 
+[error] Error: An unexpected error has occurred.

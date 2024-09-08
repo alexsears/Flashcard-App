@@ -79,9 +79,31 @@ const postReview = async (req, res) => {
       reviewCount: learningProgress.reviewCount
     });
 
+    let updatedScore;
+    if (performanceRating === 'correct') {
+      const userRef = db.collection('Users').doc(firebaseUid);
+      const userDoc = await userRef.get();
+      
+      if (!userDoc.exists) {
+        return res.status(404).json({
+          error: `User not found with ID ${firebaseUid}.`,
+        });
+      }
+
+      const userData = userDoc.data();
+      updatedScore = (userData.score || 0) + 1;
+
+      await userRef.update({
+        score: updatedScore
+      });
+
+      console.log(`Updated score for user ${firebaseUid}: ${updatedScore}`);
+    }
+
     res.json({
       message: 'Review saved successfully.',
       learningProgress,
+      updatedScore
     });
   } catch (error) {
     console.error('Error in postReview:', error);

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
@@ -6,7 +5,13 @@ import { debounce } from 'lodash';
 
 const API_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001';
 
-function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUser, setScore }) {
+function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUser, setScore, token }) {
+  console.log('Flashcard component rendered with:', {
+    flashcard,
+    currentUser,
+    languageMode,
+    token
+  });
   const frontContent = languageMode === 'english' ? flashcard.front : flashcard.back;
   const backContent = languageMode === 'english' ? flashcard.back : flashcard.front;
   const [isFlipped, setIsFlipped] = useState(false);
@@ -20,39 +25,62 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
   }, [flashcard]);
 
   const submitReview = useCallback(async (performanceRating) => {
-    if (!currentUser || !currentUser.uid) {
-      console.error('User not authenticated');
+    console.log('submitReview called with:', {
+      currentUser,
+      flashcard,
+      performanceRating
+    });
+  
+    if (!currentUser) {
+      console.error('currentUser is missing');
       return;
     }
-
+    if (!currentUser.uid) {
+      console.error('currentUser.uid is missing');
+      return;
+    }
+    if (!flashcard) {
+      console.error('flashcard is missing');
+      return;
+    }
+    if (!flashcard.id && !flashcard.cardId) {
+      console.error('flashcard.id and flashcard.cardId are missing');
+      return;
+    }
+  
     try {
       const response = await fetch(`${API_URL}/api/review`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           firebaseUid: currentUser.uid,
-          flashcardId: flashcard.id,
+          flashcardId: flashcard.id || flashcard.cardId,
           performanceRating
         })
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const result = await response.json();
-      console.log('Review submitted and score updated:', result);
+      console.log(`${new Date().toISOString()} - Review submitted. Server response:`, result);
       
-      if (performanceRating === 'correct') {
-        setScore(prevScore => prevScore + 1);
+      if (result.updatedScore !== undefined) {
+        console.log(`${new Date().toISOString()} - Updating score to:`, result.updatedScore);
+        setScore(result.updatedScore);
+        console.log('Score updated to:', result.updatedScore);
       }
     } catch (error) {
-      console.error('Error submitting review:', error);
+      console.error(`${new Date().toISOString()} - Error submitting review:`, error);
     }
-  }, [currentUser, flashcard.id, setScore]);
-
+  }, [currentUser, flashcard, setScore, token, API_URL]);  
   const debouncedOnCorrect = useCallback(
     debounce(() => {
+      console.log(`${new Date().toISOString()} - Correct answer selected (right border)`);
       setCardStatus('correct');
       submitReview('correct');
       setTimeout(() => {
@@ -65,6 +93,7 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
 
   const debouncedOnIncorrect = useCallback(
     debounce(() => {
+      console.log(`${new Date().toISOString()} - Incorrect answer selected (left border)`);
       setCardStatus('incorrect');
       submitReview('incorrect');
       setTimeout(() => {
@@ -98,10 +127,13 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
       const clickedPosition = (e.clientX - card.left) / card.width;
 
       if (clickedPosition < 0.1) {
+        console.log(`${new Date().toISOString()} - Left border clicked (Incorrect)`);
         debouncedOnIncorrect();
       } else if (clickedPosition > 0.9) {
+        console.log(`${new Date().toISOString()} - Right border clicked (Correct)`);
         debouncedOnCorrect();
       } else {
+        console.log(`${new Date().toISOString()} - Card flipped`);
         flipCard();
       }
     },
@@ -195,57 +227,8 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
           onClick={(e) => e.stopPropagation()}
         />
       </div>
-      <button onClick={debouncedOnCorrect}>Correct</button>
-      <button onClick={debouncedOnIncorrect}>Incorrect</button>
     </div>
   );
 }
 
 export default Flashcard;
-=======
-import React, { useState, useEffect } from 'react';
-import './Flashcard.css';
-
-function Flashcard({ flashcard, onCorrect, onIncorrect }) {
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-
-  useEffect(() => {
-    setStartTime(Date.now()); // start timer when card is rendered
-  }, [flashcard]);
-
-  const flipCard = () => {
-    setIsFlipped(!isFlipped);
-  };
-
-  const handleCardClick = (e) => {
-    const card = e.target.getBoundingClientRect();
-    const clickedPosition = (e.clientX - card.left) / card.width;
-
-    const responseTime = Date.now() - startTime; // calculate response time
-
-    if (clickedPosition < 0.1) {
-      onIncorrect(responseTime);
-    } else if (clickedPosition > 0.9) {
-      onCorrect(responseTime);
-    } else {
-      flipCard();
-    }
-  };
-
-  if (!flashcard) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <div className={`flashcard-container ${isFlipped ? 'is-flipped' : ''}`} onClick={handleCardClick}>
-      <div className="flashcard-flipper">
-        <div className="flashcard-question">{flashcard.front}</div>
-        <div className="flashcard-answer">{flashcard.back}</div>
-      </div>
-    </div>
-  );
-}
-
-export default Flashcard;
->>>>>>> 5c6fa5765b8595fd5a1ddf0afbc5a26c9d8a1080

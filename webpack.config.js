@@ -3,12 +3,10 @@ const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const dotenv = require('dotenv');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
   const envPath = isProduction ? '.env.production' : '.env';
-  const envVars = dotenv.config({ path: envPath }).parsed;
 
   return {
     mode: isProduction ? 'production' : 'development',
@@ -21,9 +19,17 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.js', '.jsx', '.css'],
       modules: [path.resolve(__dirname, 'src'), 'node_modules'],
-      fallback: {
+      
+        fallback: {
+        "path": require.resolve("path-browserify"),
+        "os": require.resolve("os-browserify/browser"),
+        "crypto": require.resolve("crypto-browserify"),
+        "stream": require.resolve("stream-browserify"),
+        "buffer": require.resolve("buffer/"),
         "fs": false,
-        "path": require.resolve("path-browserify")
+        "net": false,
+        "stream": false,
+        "tls": false
       },
       alias: {
         './Flashcard.css': path.resolve(__dirname, 'src/styles.css'),
@@ -55,15 +61,19 @@ module.exports = (env, argv) => {
         template: path.resolve(__dirname, 'src', 'index.html'),
       }),
       new webpack.IgnorePlugin({
+        resourceRegExp: /^(fs|path|os|crypto)$/,
+      }),
+      new webpack.IgnorePlugin({
         resourceRegExp: /\.(Flashcard|Score|index)\.css$/,
       }),
       new Dotenv({
-        path: isProduction ? '.env.production' : '.env',
+        path: envPath,
         systemvars: true,
         safe: true
       }),
-      new webpack.DefinePlugin({
-        'process.env': JSON.stringify(envVars)
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer']
       }),
     ],
     performance: isProduction ? {

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './styles.css';
@@ -6,9 +5,8 @@ import FlashcardList from './FlashcardList';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import FirebaseAuth from './FirebaseAuth';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Flashcard from './Flashcard';
 import TopBar from './TopBar';
-import ManagerConsole from './ManagerConsole';  // Import ManagerConsole here
+import ManagerConsole from './ManagerConsole';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001';
 
@@ -16,10 +14,10 @@ const refreshAuthToken = async (user) => {
   if (user) {
     try {
       const token = await user.getIdToken(true);
-      console.log("Auth token refreshed");
+      console.log(`${new Date().toISOString()} - Auth token refreshed`);
       return token;
     } catch (error) {
-      console.error("Error refreshing auth token:", error);
+      console.error(`${new Date().toISOString()} - Error refreshing auth token:`, error);
     }
   }
 };
@@ -29,7 +27,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [flashcards, setFlashcards] = useState([]);
   const [score, setScore] = useState(0);
-  const [languageMode, setLanguageMode] = useState('english'); // New state for language mode
+  const [languageMode, setLanguageMode] = useState('english');
 
   const updateFlashcards = useCallback(async (uid, token) => {
     try {
@@ -44,21 +42,38 @@ function App() {
       }
   
       const data = await response.json();
-      const newCards = data.limitedCards || [];
-      setFlashcards((prevCards) => {
-        // Avoid adding duplicate flashcards by checking IDs
-        const uniqueCards = newCards.filter(card => !prevCards.some(prevCard => prevCard.id === card.id));
-        return [...prevCards, ...uniqueCards];
-      });
-      setScore(data.score || 0);
+      console.log(`${new Date().toISOString()} - Flashcards API response:`, data);
+      
+      if (data.cards && Array.isArray(data.cards)) {
+        setFlashcards((prevCards) => {
+          const uniqueCards = data.cards.filter(card => 
+            !prevCards.some(prevCard => 
+              (prevCard.id || prevCard.cardId) === (card.id || card.cardId)
+            )
+          );
+          return [...prevCards, ...uniqueCards.map(card => ({
+            ...card,
+            id: card.id || card.cardId
+          }))];
+        });
+      } else {
+        console.error('Unexpected response format: cards is not an array', data);
+      }
+      
+      if (data.score !== undefined) {
+        console.log(`${new Date().toISOString()} - Updating score from flashcards API:`, data.score);
+        setScore(data.score);
+      }
+  
+      return data.totalCards || 0;
     } catch (error) {
       console.error('Error fetching flashcards:', error);
+      return 0;
     }
-  }, []);
-  
-  const handleLanguageChange = (mode) => {
+  }, [setScore, setFlashcards]);
+  const handleLanguageChange = useCallback((mode) => {
     setLanguageMode(mode);
-  };
+  }, []);
 
   useEffect(() => {
     const auth = getAuth();
@@ -67,10 +82,11 @@ function App() {
       setLoading(false);
   
       if (user) {
-        console.log('User signed in:', user);  // Add this log to ensure user is set
+        console.log(`${new Date().toISOString()} - User signed in:`, user);
         try {
           const token = await refreshAuthToken(user);
           if (token) {
+            console.log(`${new Date().toISOString()} - Token refreshed, fetching user data`);
             const response = await fetch(`${SERVER_URL}/api/user/${user.uid}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
@@ -78,18 +94,20 @@ function App() {
             });
             if (response.ok) {
               const userData = await response.json();
+              console.log(`${new Date().toISOString()} - Received user data:`, userData);
               setCurrentUser({
                 ...user,
                 role: userData.role
               });
+              console.log(`${new Date().toISOString()} - Setting initial score to:`, userData.score);
               setScore(userData.score || 0);
             } else {
-              console.error('Failed to fetch user data');
+              console.error(`${new Date().toISOString()} - Failed to fetch user data`);
             }
             await updateFlashcards(user.uid, token);
           }
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          console.error(`${new Date().toISOString()} - Error fetching user data:`, error);
         }
       } else {
         setCurrentUser(null);
@@ -98,7 +116,11 @@ function App() {
   
     return () => unsubscribe();
   }, [updateFlashcards]);
-  
+
+  const updateScore = useCallback((newScore) => {
+    console.log(`${new Date().toISOString()} - Updating global score from ${score} to ${newScore}`);
+    setScore(newScore);
+  }, [score]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -115,12 +137,11 @@ function App() {
           currentUser={currentUser}
           score={score}
           onLogout={() => signOut(getAuth())}
-          onLanguageChange={handleLanguageChange} // Pass language change handler
+          onLanguageChange={handleLanguageChange}
         />
         <main>
-          {currentUser ? (
+          {currentUser && (
             <Routes>
-              // In App.js
               <Route path="/" element={
                 <FlashcardList
                   key={flashcards.length}
@@ -128,60 +149,17 @@ function App() {
                   initialFlashcards={flashcards}
                   updateFlashcards={() => updateFlashcards(currentUser.uid)}
                   score={score}
-                  setScore={setScore}
+                  setScore={updateScore}
                   languageMode={languageMode}
-                  currentUser={currentUser} // Add this line
+                  currentUser={currentUser}
                 />
               } />
               <Route path="/manager-console" element={<ManagerConsole />} />
             </Routes>
-          ) : (
-            <FirebaseAuth />
           )}
         </main>
       </div>
     </Router>
-=======
-import React, { useEffect, useState } from 'react';
-import './App.css';
-import FlashcardList from './FlashcardList';
-import { getAuth, onAuthStateChanged } from "firebase/auth"; // Adjusted import
-import LogoutButton from './LogoutButton';
-import FirebaseAuth from './FirebaseAuth';
-
-function App() {
-  const [currentUser, setCurrentUser] = useState();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-    });
-
-    // returning the unsubscribe function will ensure that
-    // we unsubscribe from this listener if the component unmounts.
-    return unsubscribe; 
-  }, []);
-
-  // display a loading message while waiting for the auth state to change
-  if (loading) {
-    return <div>Loading...</div>; 
-  }
-
-  return (
-    <div className="App">
-      {currentUser ? (
-        <div>
-          <LogoutButton />
-          <FlashcardList userId={currentUser.uid} /> {/* Pass userId to FlashcardList */}
-        </div>
-      ) : (
-        <FirebaseAuth />
-      )}
-    </div>
->>>>>>> 5c6fa5765b8595fd5a1ddf0afbc5a26c9d8a1080
   );
 }
 

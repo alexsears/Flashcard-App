@@ -1,11 +1,10 @@
+require('dotenv').config();
 
-// At the beginning of the file
 console.log('Node environment:', process.env.NODE_ENV);
 console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID);
 console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL);
 console.log('FIREBASE_PRIVATE_KEY_BASE64 is set:', !!process.env.FIREBASE_PRIVATE_KEY_BASE64);
 console.log('FIREBASE_CONFIG is set:', !!process.env.FIREBASE_CONFIG);
-console.log('decodedPrivateKey:', decodedPrivateKey);
 
 const functions = require('firebase-functions');
 const express = require('express');
@@ -14,10 +13,12 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const admin = require('firebase-admin');
+
 // Decode the base64 private key
 let decodedPrivateKey;
 try {
   decodedPrivateKey = Buffer.from(process.env.FIREBASE_PRIVATE_KEY_BASE64, 'base64').toString('utf8');
+  console.log('Private key decoded successfully');
 } catch (error) {
   console.error('Error decoding FIREBASE_PRIVATE_KEY_BASE64:', error);
   process.exit(1);
@@ -46,10 +47,11 @@ try {
   console.error('Error initializing Firebase Admin SDK:', error);
   process.exit(1);
 }
+
 // Express app setup
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors({ origin: true }));
+app.use(express.json());
 
 // Parse FIREBASE_CONFIG
 let firebaseConfig;

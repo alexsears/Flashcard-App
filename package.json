@@ -45,19 +45,21 @@
     "socket.io-client": "^4.7.1",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "client": "cross-env PORT=3000 react-scripts start",
-    "server": "cross-env PORT=3001 node functions/index.js",
-    "dev": "concurrently \"npm run client\" \"npm run server\"",
-    "build": "cross-env NODE_ENV=production webpack --mode production",
-    "prepare-env-vars": "node formatEnv.js",
-    "start": "node functions/index.js",
-    "start-dev": "node -r dotenv/config functions/index.js",
-    "deploy": "gcloud run deploy server --source . --platform managed --region us-south1 --allow-unauthenticated",
-    "deploy-docker": "gcloud run deploy server --image gcr.io/pootcuppeelek/server --platform managed --region us-south1 --allow-unauthenticated"
-  },
+
+    "scripts": {
+      "test": "react-app-rewired test",
+      "eject": "react-scripts eject",
+      "client": "cross-env PORT=3000 react-app-rewired start",
+      "server": "cross-env PORT=3001 node functions/index.js",
+      "dev": "concurrently \"npm run client\" \"npm run server\"",
+      "build": "cross-env NODE_ENV=production react-app-rewired build",
+      "prepare-env-vars": "node formatEnv.js",
+      "start": "node functions/index.js",
+      "start-dev": "cross-env NODE_ENV=development PORT=3001 node -r dotenv/config functions/index.js",
+      "deploy": "gcloud run deploy server --source . --platform managed --region us-south1 --allow-unauthenticated",
+      "deploy-docker": "gcloud run deploy server --image gcr.io/pootcuppeelek/server --platform managed --region us-south1 --allow-unauthenticated"
+    },
+
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -81,24 +83,33 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
     "@babel/preset-env": "^7.22.5",
     "@babel/preset-react": "^7.22.5",
+    "assert": "^2.1.0",
     "babel-loader": "^9.1.2",
+    "buffer": "^6.0.3",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.8.1",
     "dotenv": "^16.4.5",
-    "dotenv-webpack": "^8.0.1",
+    "dotenv-webpack": "^8.1.0",
     "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.3",
+    "html-webpack-plugin": "^5.6.0",
+    "https-browserify": "^1.0.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "null-loader": "^4.0.1",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
     "raw-loader": "^4.0.2",
+    "react-app-rewired": "^2.2.1",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
     "style-loader": "^3.3.3",
-    "webpack": "^5.88.0",
+    "url": "^0.11.4",
+    "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^4.15.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "engines": {
     "node": "16"

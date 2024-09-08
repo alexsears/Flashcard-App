@@ -9,88 +9,100 @@ if (!admin.apps.length) {
 const getFlashcards = async (req, res) => {
   try {
     const firebaseUid = req.query.firebaseUid;
-    const limit = parseInt(req.query.limit) || 3;
-
-    if (!firebaseUid) {
-      console.error('Firebase UID is missing');
-      return res.status(400).json({ error: 'Firebase UID is required' });
-    }
-
     const currentDate = admin.firestore.Timestamp.now();
-    console.log(`Fetching flashcards for user: ${firebaseUid}, at: ${new Date().toLocaleString()}`);
+    const maxCardsPerSession = 20;
 
-    // Query to fetch due flashcards with a limit
-    const dueCardsQuery = db.collectionGroup('LearningProgress')
-      .where('firebaseUid', '==', firebaseUid)
-      .where('nextReviewDate', '<=', currentDate)
-      .orderBy('nextReviewDate')
-      .limit(limit);
+    // Fetch the user's data (including score)
+    const usersCollection = db.collection('Users');
+    const userSnapshot = await usersCollection.doc(firebaseUid).get();
+    const user = userSnapshot.data();
 
-    const dueCardsSnapshot = await dueCardsQuery.get();
-    let cards = [];
-
-    if (!dueCardsSnapshot.empty) {
-      const dueCards = dueCardsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      console.log(`Found ${dueCards.length} due flashcards for user: ${firebaseUid}`);
-
-      const flashcardIds = dueCards.map(card => card.flashcardId);
-      const flashcardsSnapshot = await db.collection('Flashcards')
-        .where(admin.firestore.FieldPath.documentId(), 'in', flashcardIds)
-        .get();
-
-      const flashcardsMap = new Map(flashcardsSnapshot.docs.map(doc => [doc.id, doc.data()]));
-
-      cards = dueCards.map(dueCard => {
-        const flashcardData = flashcardsMap.get(dueCard.flashcardId) || {};
-        return {
-          id: dueCard.flashcardId,
-          front: flashcardData.front,
-          back: flashcardData.back,
-          easeFactor: dueCard.easeFactor,
-          interval: dueCard.interval,
-          reviewCount: dueCard.reviewCount,
-          nextReviewDate: dueCard.nextReviewDate.toDate(),
-        };
-      });
-
-      console.log('Fetched flashcards:', cards);
+    if (!user) {
+      console.error('User not found');
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    // Send response with total number of due cards and the fetched set
+    const currentScore = user.score || 0;
+    console.log(`Fetching flashcards for user: ${firebaseUid}, current score: ${currentScore}, at: ${currentDate.toDate().toLocaleString()}`);
+
+    // Get the LearningProgress collection
+    const learningProgressCollection = db.collection('LearningProgress');
+
+    // Get all documents from the collection for this user
+    const learningProgressSnap = await learningProgressCollection.where('firebaseUid', '==', firebaseUid).get();
+    const learningProgress = learningProgressSnap.docs.map(doc => ({...doc.data(), id: doc.id}));
+
+    // Filter the learning progress entries that are due
+    const dueCardsProgress = learningProgress.filter(entry => 
+      entry.nextReviewDate.toDate() <= currentDate.toDate()
+    ).sort((a, b) => a.nextReviewDate.toDate() - b.nextReviewDate.toDate());
+
+    // Fetch the flashcards
+    const flashcardsCollection = db.collection('Flashcards');
+    const flashcardSnap = await flashcardsCollection.get();
+    const flashcards = flashcardSnap.docs.map(doc => ({...doc.data(), cardId: doc.id}));
+
+    if (!flashcards.length) {
+      console.error('No flashcards found in the database');
+      return res.status(500).json({ error: 'No flashcards found in the database' });
+    }
+
+    let responseCards;
+
+    // If no due cards, assign new cards
+    if (dueCardsProgress.length === 0) {
+      // Filter the flashcards with cardId greater than progress
+      const newFlashcards = flashcards
+        .filter(flashcard => flashcard.cardid > user.progress && !learningProgress.find(lp => lp.flashcardId === flashcard.cardId))
+        .sort((a, b) => a.cardid - b.cardid)
+        .slice(0, maxCardsPerSession);
+
+      // Update the user's progress if new cards were fetched
+      if (newFlashcards.length > 0) {
+        await usersCollection.doc(firebaseUid).update({ progress: newFlashcards[newFlashcards.length - 1].cardid });
+      }
+
+      // Create Learning Progress entries for the new flashcards
+      for (const flashcard of newFlashcards) {
+        const id = `${firebaseUid}_${flashcard.cardId}`;
+        await learningProgressCollection.doc(id).set({
+          firebaseUid: firebaseUid,
+          flashcardId: flashcard.cardId,
+          nextReviewDate: currentDate,
+          interval: 1,
+          reviewCount: 0,
+          easeFactor: 2.5
+        });
+      }
+
+      responseCards = newFlashcards;
+    } else {
+      // Limit the results
+      dueCardsProgress.length = Math.min(dueCardsProgress.length, maxCardsPerSession);
+
+      // Map the due learning progress entries to their respective flashcards
+      responseCards = dueCardsProgress.map(lp => 
+        flashcards.find(card => card.cardId === lp.flashcardId)
+      ).filter(card => card !== undefined);
+    }
+
+    console.log('Response:', responseCards);
+
     res.json({
-      totalDueCards: dueCardsSnapshot.size,
-      limitedCards: cards,
-      hasMore: dueCardsSnapshot.size === limit,
+      cards: responseCards,
+      score: currentScore,
+      totalCards: responseCards.length
     });
   } catch (err) {
-    console.error('Error getting flashcards:', err);
-    res.status(500).json({ error: 'An error occurred while getting flashcards' });
+    console.error('An error occurred when getting flashcards:', err);
+    res.status(500).json({ error: 'An error occurred when getting flashcards', details: err.message });
   }
 };
 
-
+// If you need the getFlashcard function, define it here
 const getFlashcard = async (req, res) => {
-  const flashcardId = req.params.flashcardId;
-  try {
-    const flashcardRef = db.collection('Flashcards').doc(flashcardId);
-    const doc = await flashcardRef.get();
-    if (!doc.exists) {
-      res.status(404).json({ error: `Flashcard with ID ${flashcardId} not found.` });
-      return;
-    }
-    const flashcardData = doc.data();
-    res.json({
-      id: doc.id,
-      ...flashcardData
-    });
-  } catch (error) {
-    console.error('Error getting flashcard:', error);
-    res.status(500).json({ error: 'An error occurred while trying to get flashcard.' });
-  }
+  // Implementation of getFlashcard function
+  // ...
 };
 
 module.exports = {

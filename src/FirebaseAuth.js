@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react';
-<<<<<<< HEAD
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { app } from './firebaseConfig';
 import bookImage from './book.jpg';
 
-const API_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001';
+const API_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001'; 
 
 function FirebaseAuth() {
   const [error, setError] = useState(null);
@@ -104,8 +103,10 @@ function FirebaseAuth() {
     const endpoint = isNewUser ? '/api/signup' : '/api/login';
   
     try {
+      console.log(`${new Date().toISOString()} - User signed in, refreshing token`);
       await refreshToken();
       const token = await user.getIdToken();
+      console.log(`${new Date().toISOString()} - Token refreshed, sending request to ${endpoint}`);
       const response = await fetch(`${API_URL}${endpoint}`, { 
         method: 'POST',
         headers: { 
@@ -114,29 +115,37 @@ function FirebaseAuth() {
         },
         body: JSON.stringify({ 
           uid: user.uid,
-          email: user.email // Send email as well
+          email: user.email
         }),
       });
   
       if (!response.ok) throw new Error('Failed to sign up or log in on the server.');
       
       const data = await response.json();
-      console.log('Server response:', data);
+      console.log(`${new Date().toISOString()} - Server response:`, data);
   
+      if (data.user && data.user.score !== undefined) {
+        console.log(`${new Date().toISOString()} - User ${user.uid} logged in with score: ${data.user.score}`);
+      } else {
+        console.log(`${new Date().toISOString()} - User ${user.uid} logged in, but score was not in the response`);
+      }
+  
+      console.log(`${new Date().toISOString()} - Fetching additional user data`);
       const userResponse = await fetch(`${API_URL}/api/user/${user.uid}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
       if (userResponse.ok) {
         const userData = await userResponse.json();
-        console.log(`User role: ${userData.role}`);
+        console.log(`${new Date().toISOString()} - User data from /api/user/:uid:`, userData);
+        console.log(`${new Date().toISOString()} - User role: ${userData.role}`);
         if (userData.role === 'manager') {
           const newUrl = `${window.location.origin}/manager-console`;
           window.open(newUrl, '_blank');
         }
       }
     } catch (error) {
-      console.error('Error during server signup or log in:', error);
+      console.error(`${new Date().toISOString()} - Error during server signup or log in:`, error);
       setError('Failed to complete login process. Please try again.');
     }
   }, []);
@@ -155,66 +164,11 @@ function FirebaseAuth() {
           {loading ? 'Processing...' : 'Sign In with Google'}
         </Button>
         {error && <p className="error-message">{error}</p>}
-=======
-import { app } from './firebaseConfig';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-
-function FirebaseAuth({ fetchFlashcards }) {
-  const [error, setError] = useState(null);
-
-  const handleSignUp = useCallback(async (event) => {
-    event.preventDefault();
-    const { email, password } = event.target.elements;
-    try {
-      await app.auth().createUserWithEmailAndPassword(email.value, password.value).then((userCredential) => {
-        var user = userCredential.user;
-        console.log('User ID after signing up:', user.uid);
-        
-        fetchFlashcards(user.uid);
-      });
-    } catch (error) {
-      setError('Error signing up with email and password');
-    }
-  }, [fetchFlashcards]);
-
-  const handleGoogleSignIn = useCallback(async () => {
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth();
-    try {
-      await signInWithPopup(auth, provider).then((result) => {
-        const user = result.user;
-        console.log('User ID after signing in with Google:', user.uid);
-        
-        fetchFlashcards(user.uid);
-
-        // ...rest of your code
-      });
-    } catch (error) {
-      setError('Error signing in with Google');
-    }
-  }, [fetchFlashcards]);
-
-  return (
-    <div>
-      <form onSubmit={handleSignUp}>
-        <label>
-          Email
-          <input name="email" type="email" placeholder="Email" />
-        </label>
-        <label>
-          Password
-          <input name="password" type="password" placeholder="Password" />
-        </label>
-        <button type="submit">Sign Up</button>
-        <button onClick={handleGoogleSignIn}>Sign In with Google</button>
-        {error && <p>{error}</p>}
->>>>>>> 5c6fa5765b8595fd5a1ddf0afbc5a26c9d8a1080
       </form>
     </div>
   );
 }
 
-<<<<<<< HEAD
 const Input = ({ label, type, name }) => (
   <label className="label">
     {label}
@@ -238,6 +192,3 @@ const Button = ({ children, type, onClick, className }) => (
 );
 
 export default FirebaseAuth;
-=======
-export default FirebaseAuth;
->>>>>>> 5c6fa5765b8595fd5a1ddf0afbc5a26c9d8a1080
