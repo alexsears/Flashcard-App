@@ -32,7 +32,7 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: white;
-    padding: 15px 30px;
+    padding: 10px 20px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
@@ -42,9 +42,15 @@ body {
     gap: 5px;
   }
   
-  .left-section, .right-section {
+  .left-section {
     display: flex;
     align-items: center;
+  }
+  
+  .right-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
   }
   
   .logo {
@@ -85,21 +91,17 @@ body {
   
   /* Logout Button */
   .logout-button {
-    background-color: #dc3545;
-    color: white;
+    background: none;
     border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    margin-left: 20px;
+    font-size: 1.2em;
+    color: #333;
+    padding: 5px;
+    transition: color 0.3s ease;
   }
   
   .logout-button:hover {
-    background-color: #c82333;
+    color: #dc3545;
   }
   
   /* Flashcard Styles */
@@ -330,7 +332,10 @@ body {
     width: auto;
     margin-right: 20px;
   }
-  
+  .app-logo {
+    height: 60px; /* Adjust as needed */
+    width: auto;
+  }
   nav {
     display: flex;
     gap: 20px;
@@ -350,10 +355,8 @@ body {
   }
   
   .score-container {
-    /* Styles for the score container */
-    background-color: transparent;
-    padding: 5px;
-    border-radius: 4px;
+    font-size: 1em;
+    margin-right: 10px;
   }
   
   /* Adjust the size of the SevenSegmentDisplay if needed */
@@ -454,12 +457,13 @@ body {
     }
   }
   .language-toggle-switch {
-    width: 100px; /* Adjusted container width */
+    width: 80px; /* Adjusted container width */
     height: 40px; /* Adjusted height */
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: relative;
+    cursor: pointer;
     background-color: #f0f0f0; /* Light background */
     border-radius: 20px; /* Rounded corners */
     padding: 5px;
@@ -476,14 +480,15 @@ body {
     top: 8px; /* Better vertical alignment */
     transition: all 0.3s ease;
     z-index: 1; /* Ensure slider is not behind the flags */
+    background-color: rgba(255, 255, 255, 0.7);
   }
   
   .english-mode {
-    left: 5px; /* Adjusted for correct positioning */
+    left: 8px; /* Adjusted for correct positioning */
   }
   
   .thai-mode {
-    left: 60px; /* Adjusted for correct positioning */
+    right: 8px; /* Adjusted for correct positioning */
   }
   
   .flag-icon {
@@ -493,13 +498,13 @@ body {
   
   .usa-flag {
     position: absolute;
-    left: 10px; /* Spacing from the left side */
+    left: 5px; /* Spacing from the left side */
     top: 5px; /* Centered */
   }
   
   .thai-flag {
     position: absolute;
-    right: 10px; /* Spacing from the right side */
+    right: 5px; /* Spacing from the right side */
     top: 5px; /* Centered */
   }
   
@@ -516,4 +521,4 @@ body {
   .language-toggle-switch img:hover {
     filter: brightness(1.1);
   }
-  
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
