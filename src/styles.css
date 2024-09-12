@@ -86,7 +86,7 @@ body {
   .score-container {
     display: flex;
     align-items: center;
-    font-size: 1em;
+    font-size: 10px;
   }
   
   /* Logout Button */
@@ -358,6 +358,11 @@ body {
     font-size: 1em;
     margin-right: 10px;
   }
+
+  .score-container span {
+    font-size: 16px;
+    color: #333;
+  }
   
   /* Adjust the size of the SevenSegmentDisplay if needed */
   .score-container > div {
@@ -459,6 +464,7 @@ body {
   .language-toggle-switch {
     width: 80px; /* Adjusted container width */
     height: 40px; /* Adjusted height */
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -520,5 +526,285 @@ body {
   /* Optional hover effect */
   .language-toggle-switch img:hover {
     filter: brightness(1.1);
+    opacity: 0.8;
   }
   @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+
+/* Add these new styles for the digital counter */
+.digital-counter {
+  display: flex;
+  background-color: #000;
+  padding: 5px;
+  border-radius: 5px;
+}
+.digit {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px;
+  color: #00ff00;
+  background-color: #000;
+  padding: 0 2px;
+  margin: 0 1px;
+  border-radius: 3px;
+}
+
+/* Update or add these styles for the top bar layout */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo {
+  height: 40px;
+  width: auto;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.score-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.score-container span {
+  font-size: 16px;
+  color: #333;
+}
+
+/* Update the language toggle switch styles */
+.language-toggle-switch {
+  width: 80px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  padding: 5px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.language-toggle-switch:hover {
+  cursor: pointer;
+}
+
+.toggle-slider {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  top: 8px;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.english-mode {
+  left: 5px;
+}
+
+.thai-mode {
+  right: 5px;
+}
+
+.flag-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.usa-flag {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
+
+.thai-flag {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
+/* Style for the logout button */
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  color: #333;
+  padding: 5px;
+  transition: color 0.3s ease;
+}
+
+.logout-button:hover {
+  color: #dc3545;
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.login-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 300px;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #4285f4;
+  outline: none;
+}
+
+.input-group i {
+  position: absolute;
+  top: 35px;
+  right: 10px;
+  color: #999;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #4285f4;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #357ae8;
+}
+
+.btn-google {
+  background-color: #db4437;
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-google:hover {
+  background-color: #c23321;
+}
+body {
+  background-color: #f0f2f5;
+  font-family: Arial, sans-serif;
+}
+
+.login-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: block;
+  width: 150px;
+  margin: 0 auto 20px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-primary {
+  background-color: #1877f2;
+  color: white;
+}
+
+.btn-google {
+  background-color: #db4437;
+  color: white;
+}

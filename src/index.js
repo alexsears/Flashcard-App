@@ -4,63 +4,33 @@ import './styles.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { initializeApp } from 'firebase/app';
-import ErrorBoundary from './ErrorBoundary'; // Ensure this component exists
-require('dotenv').config();
+import ErrorBoundary from './ErrorBoundary';
+import { logEnvironmentInfo, initializeFirebase } from './utils/firebaseUtils';
 
-// Initialize decodedPrivateKey safely
-let decodedPrivateKey = null;
-if (process.env.FIREBASE_PRIVATE_KEY_BASE64) {
-  decodedPrivateKey = Buffer.from(process.env.FIREBASE_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
-}
-
-console.log('Node environment:', process.env.NODE_ENV);
-console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID);
-console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL);
-console.log('FIREBASE_PRIVATE_KEY_BASE64 is set:', !!process.env.FIREBASE_PRIVATE_KEY_BASE64);
-console.log('FIREBASE_CONFIG is set:', !!process.env.FIREBASE_CONFIG);
-console.log('decodedPrivateKey:', decodedPrivateKey);
-
-if (!decodedPrivateKey) {
-  console.error('FIREBASE_PRIVATE_KEY_BASE64 is not set or is invalid.');
-}
-
-// Continue with your Firebase initialization or other logic here
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.appspot.com`,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
-};
-
-// Log Firebase config in development mode
+// Load environment variables
 if (process.env.NODE_ENV !== 'production') {
-  console.log('Firebase Config:', firebaseConfig);
-  Object.entries(firebaseConfig).forEach(([key, value]) => {
-    console.log(`${key}:`, value);
-  });
+  require('dotenv').config();
+}
+
+// Log environment information (only in development)
+if (process.env.NODE_ENV === 'development') {
+  logEnvironmentInfo();
 }
 
 // Initialize Firebase
-try {
-  const firebaseApp = initializeApp(firebaseConfig); // Renamed to firebaseApp to avoid confusion
-  console.log('Firebase initialized successfully');
-} catch (error) {
-  console.error('Error initializing Firebase:', error);
-}
+const firebaseApp = initializeFirebase();
 
 // Render the React app
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <App />
+      <App firebaseApp={firebaseApp} />
     </ErrorBoundary>
   </React.StrictMode>
 );
 
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

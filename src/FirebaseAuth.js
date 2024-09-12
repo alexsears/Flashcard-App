@@ -152,19 +152,28 @@ function FirebaseAuth() {
   
 
   return (
-    <div className="container">
-      <form onSubmit={handleSignUp} className="form">
-        <img src={bookImage} alt="Book" className="book-image" />
-        <Input label="Email" type="email" name="email" />
-        <Input label="Password" type="password" name="password" />
-        <Button type="submit" className="button-signup" disabled={loading}>
+    <div className="login-container">
+      <img src={bookImage} alt="Logo" className="logo" />
+      <h2>Welcome</h2>
+      <form onSubmit={handleSignUp}>
+        <div className="input-group">
+          <label htmlFor="email">Email</label>
+          <input type="email" id="email" name="email" required />
+          <i className="fas fa-envelope"></i>
+        </div>
+        <div className="input-group">
+          <label htmlFor="password">Password</label>
+          <input type="password" id="password" name="password" required />
+          <i className="fas fa-lock"></i>
+        </div>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Processing...' : 'Sign Up / Sign In'}
-        </Button>
-        <Button onClick={handleGoogleSignIn} className="button-google" disabled={loading}>
-          {loading ? 'Processing...' : 'Sign In with Google'}
-        </Button>
-        {error && <p className="error-message">{error}</p>}
+        </button>
       </form>
+      <button onClick={handleGoogleSignIn} className="btn btn-google" disabled={loading}>
+        {loading ? 'Processing...' : 'Sign In with Google'}
+      </button>
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
 }

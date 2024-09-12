@@ -27,7 +27,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [flashcards, setFlashcards] = useState([]);
   const [score, setScore] = useState(0);
-  const [languageMode, setLanguageMode] = useState('english');
+  const [languageMode, setLanguageMode] = useState('Thai');
 
   const updateFlashcards = useCallback(async (uid, token) => {
     try {
@@ -71,9 +71,11 @@ function App() {
       return 0;
     }
   }, [setScore, setFlashcards]);
-  const handleLanguageChange = useCallback((mode) => {
-    setLanguageMode(mode);
-  }, []);
+  
+  const handleLanguageChange = (newLanguage) => {
+    console.log('Parent component: Language change received', newLanguage);
+    setLanguageMode(newLanguage);
+  };
 
   useEffect(() => {
     const auth = getAuth();
@@ -137,6 +139,7 @@ function App() {
           currentUser={currentUser}
           score={score}
           onLogout={() => signOut(getAuth())}
+          languageMode={languageMode}
           onLanguageChange={handleLanguageChange}
         />
         <main>
