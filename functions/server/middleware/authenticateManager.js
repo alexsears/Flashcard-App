@@ -1,41 +1,23 @@
 const admin = require('firebase-admin');
-const db = admin.firestore();
 
-
-
-async function authenticateManager(req, res, next) {
+exports.authenticateManager = async (req, res, next) => {
   try {
-    // Ensure req.user is populated (assumes previous middleware set it)
-    if (!req.user || !req.user.uid) {
-      return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
+    const token = req.headers.authorization.split('Bearer ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const uid = decodedToken.uid;
+
+    const userDoc = await admin.firestore().collection('Users').doc(uid).get();
+    const userData = userDoc.data();
+
+    if (userData && userData.role === 'manager') {
+      req.user = { ...userData, uid };
+      next();
+    } else {
+      res.status(403).json({ error: 'Access denied. Manager role required.' });
     }
-
-    const userId = req.user.uid;
-
-    // Fetch the user's role from the database
-    const userSnap = await db.collection('Users').doc(userId).get();
-
-    if (!userSnap.exists) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const userData = userSnap.data();
-    const userRole = userData.role;
-
-    // Check if the user is a manager
-    if (userRole !== 'manager') {
-      return res.status(403).json({ error: 'Insufficient permissions' });
-    }
-
-    // If the user is a manager, allow the request to continue
-    next();
-
   } catch (error) {
-    console.error('Error in authenticateManager middleware:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error authenticating manager:', error);
+    res.status(401).json({ error: 'Authentication failed' });
   }
-}
-
-module.exports = {
-  authenticateManager
 };
+

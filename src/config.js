@@ -1,14 +1,5 @@
-const env = process.env.NODE_ENV || 'development';
-
 const config = {
-  development: {
-    apiUrl: 'http://localhost:3001/api',
-    firebaseConfig: JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || '{}'),
-  },
-  production: {
-    apiUrl: '/api',
-    firebaseConfig: JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || '{}'),
-  },
+  apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3001/api'
 };
 
-export default config[env];
+export default config;

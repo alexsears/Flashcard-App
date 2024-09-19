@@ -199,7 +199,57 @@ const getLearningProgressStats = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      throw new Error('Token is missing from request body');
+    }
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const { uid, email } = decodedToken;
+    
+    // Use the existing postLogin logic
+    const userCollection = db.collection('Users');
+    const userDoc = userCollection.doc(uid);
+    let userSnap = await userDoc.get();
+    let user = userSnap.data();
+
+    const flashcardsCollection = db.collection('Flashcards');
+    const learningProgressCollection = db.collection('LearningProgress');
+
+    if (!user) {
+      console.log(`User with ID ${uid} not found. Signing up...`);
+      user = await createUser(uid, email, userCollection, flashcardsCollection, learningProgressCollection);
+    } else {
+      console.log(`User with ID ${uid} found. Updating last login...`);
+      await userDoc.update({ lastLogin: admin.firestore.FieldValue.serverTimestamp() });
+    }
+
+    const learningProgressSnap = await learningProgressCollection.where('firebaseUid', '==', uid).get();
+    const learningProgress = learningProgressSnap.docs.map(doc => ({...doc.data(), id: doc.id}));
+
+    console.log(`Learning progress fetched for user: ${uid}`);
+
+    const dueCards = learningProgress.filter(lp => new Date(lp.nextReviewDate.toDate()) <= new Date());
+    console.log(`Found ${dueCards.length} due flashcards for user: ${uid}`);
+
+    res.json({
+      message: `User with ID ${uid} logged in successfully.`,
+      user: { 
+        ...user, 
+        score: user.score, 
+        dueCards: dueCards.length 
+      },
+      dueCards
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Failed to sign up or log in on the server.', error: error.message });
+  }
+};
+
 module.exports = {
+  login,
   postSignup,
   postLogin,
   getUser,

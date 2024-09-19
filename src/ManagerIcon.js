@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
 
-const ManagerConsole = () => {
+const ManagerIcon = () => {
   const [isManager, setIsManager] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkManagerStatus = async () => {
@@ -19,36 +18,31 @@ const ManagerConsole = () => {
           });
           if (response.ok) {
             setIsManager(true);
-          } else {
-            window.close(); // Close the tab if not a manager
           }
         } catch (error) {
           console.error('Error checking manager status:', error);
-          window.close(); // Close the tab on error
         }
-      } else {
-        window.close(); // Close the tab if no user is logged in
       }
-      setIsLoading(false);
     };
 
     checkManagerStatus();
   }, []);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleClick = () => {
+    if (isManager) {
+      window.open('/manager', '_blank');
+    } else {
+      alert('You do not have manager access.');
+    }
+  };
 
-  if (!isManager) {
-    return null; // This will prevent any flash of content before redirect
-  }
+  if (!isManager) return null;
 
   return (
-    <div>
-      <h1>Manager Console</h1>
-      {/* Add manager console content here */}
-    </div>
+    <button onClick={handleClick}>
+      Open Manager Console
+    </button>
   );
 };
 
-export default ManagerConsole;
+export default ManagerIcon;

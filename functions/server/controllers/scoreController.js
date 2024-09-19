@@ -118,9 +118,43 @@ const getDueFlashcardsCount = async (req, res) => {
   }
 };
 
-// Export all functions
+// Add this function to your scoreController.js
+const getUserScore = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    console.log('getUserScore - userId:', userId);
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const userDoc = await db.collection('Users').doc(userId).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        error: `User with ID ${userId} not found.`,
+      });
+    }
+
+    const user = userDoc.data();
+    console.log('getUserScore - User data:', user);
+
+    res.json({
+      score: user.score || 0, // Default to 0 if score is not defined
+    });
+  } catch (error) {
+    console.error('Error in getUserScore:', error);
+    res.status(500).json({
+      error: 'An error occurred while trying to get the user score.',
+      details: error.message
+    });
+  }
+};
+
+// Don't forget to export the new function
 module.exports = {
   getScore,
   postScore,
-  getDueFlashcardsCount
+  getDueFlashcardsCount,
+  getUserScore // Add this line
 };

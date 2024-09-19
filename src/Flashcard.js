@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import { debounce } from 'lodash';
+import { submitReview, fetchWithRetry } from './utils/api';
 
 const API_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001';
 
-function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUser, setScore, token }) {
-  console.log('Flashcard component rendered with:', {
-    flashcard,
-    currentUser,
-    languageMode,
-    token
-  });
-  const frontContent = languageMode === 'english' ? flashcard.front : flashcard.back;
-  const backContent = languageMode === 'english' ? flashcard.back : flashcard.front;
+function Flashcard({ flashcard, onNextCard, languageMode, currentUser, token, setScore }) {
+  const frontContent = useMemo(() => languageMode === 'english' ? flashcard.front : flashcard.back, [flashcard, languageMode]);
+  const backContent = useMemo(() => languageMode === 'english' ? flashcard.back : flashcard.front, [flashcard, languageMode]);
   const [isFlipped, setIsFlipped] = useState(false);
   const [cardStatus, setCardStatus] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -24,84 +19,66 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
     setIsFlipped(false);
   }, [flashcard]);
 
-  const submitReview = useCallback(async (performanceRating) => {
-    console.log('submitReview called with:', {
-      currentUser,
-      flashcard,
-      performanceRating
-    });
-  
-    if (!currentUser) {
-      console.error('currentUser is missing');
+  const submitReview = async ({ currentUser, flashcard, performanceRating }) => {
+    console.log('submitReview called with:', { currentUser, flashcard, performanceRating, token });
+    
+    if (!token) {
+      console.error('No token available. Please log in again.');
       return;
     }
-    if (!currentUser.uid) {
-      console.error('currentUser.uid is missing');
-      return;
-    }
-    if (!flashcard) {
-      console.error('flashcard is missing');
-      return;
-    }
-    if (!flashcard.id && !flashcard.cardId) {
-      console.error('flashcard.id and flashcard.cardId are missing');
-      return;
-    }
-  
+
     try {
-      const response = await fetch(`${API_URL}/api/review`, {
+      console.log('Sending review request to:', `${API_URL}/api/review`);
+      const response = await fetchWithRetry(`${API_URL}/api/review`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
-          firebaseUid: currentUser.uid,
-          flashcardId: flashcard.id || flashcard.cardId,
+          userId: currentUser.uid,
+          flashcardId: flashcard.id,
           performanceRating
         })
       });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      console.log('Review submitted successfully:', data);
+
+      if (data.updatedScore !== undefined) {
+        console.log('New score received:', data.updatedScore);
+        setScore(data.updatedScore);  // Use setScore here
       }
-  
-      const result = await response.json();
-      console.log(`${new Date().toISOString()} - Review submitted. Server response:`, result);
-      
-      if (result.updatedScore !== undefined) {
-        console.log(`${new Date().toISOString()} - Updating score to:`, result.updatedScore);
-        setScore(result.updatedScore);
-        console.log('Score updated to:', result.updatedScore);
-      }
+
+      onNextCard();
     } catch (error) {
-      console.error(`${new Date().toISOString()} - Error submitting review:`, error);
+      console.error('Error submitting review:', error);
     }
-  }, [currentUser, flashcard, setScore, token, API_URL]);  
-  const debouncedOnCorrect = useCallback(
+  };
+
+  const debouncedOnCorrect = useMemo(() => 
     debounce(() => {
-      console.log(`${new Date().toISOString()} - Correct answer selected (right border)`);
       setCardStatus('correct');
-      submitReview('correct');
+      submitReview({ currentUser, flashcard, performanceRating: 'correct' });
       setTimeout(() => {
-        onCorrect();
+        onNextCard();
         setCardStatus('');
       }, 300);
     }, 500, { leading: true, trailing: false }),
-    [onCorrect, submitReview]
+    [onNextCard, submitReview]
   );
 
-  const debouncedOnIncorrect = useCallback(
+  const debouncedOnIncorrect = useMemo(() => 
     debounce(() => {
-      console.log(`${new Date().toISOString()} - Incorrect answer selected (left border)`);
       setCardStatus('incorrect');
-      submitReview('incorrect');
+      submitReview({ currentUser, flashcard, performanceRating: 'incorrect' });
       setTimeout(() => {
-        onIncorrect();
+        onNextCard();
         setCardStatus('');
       }, 300);
     }, 500, { leading: true, trailing: false }),
-    [onIncorrect, submitReview]
+    [onNextCard, submitReview]
   );
 
   const flipCard = useCallback(() => {
@@ -127,13 +104,10 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
       const clickedPosition = (e.clientX - card.left) / card.width;
 
       if (clickedPosition < 0.1) {
-        console.log(`${new Date().toISOString()} - Left border clicked (Incorrect)`);
         debouncedOnIncorrect();
       } else if (clickedPosition > 0.9) {
-        console.log(`${new Date().toISOString()} - Right border clicked (Correct)`);
         debouncedOnCorrect();
       } else {
-        console.log(`${new Date().toISOString()} - Card flipped`);
         flipCard();
       }
     },
@@ -144,9 +118,12 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
     async (text, languageCode) => {
       try {
         setIsPlaying(true);
-        const response = await fetch(`${API_URL}/api/synthesize`, {
+        const response = await fetchWithRetry(`${API_URL}/api/synthesize-speech`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify({ text, languageCode }),
         });
         if (!response.ok) {
@@ -158,13 +135,15 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
         const audio = new Audio(url);
         audio.playbackRate = playbackSpeed;
         await audio.play();
+        URL.revokeObjectURL(url);  // Clean up the URL after playing
       } catch (error) {
         console.error('Error playing audio:', error);
+        // Here you might want to show an error message to the user
       } finally {
         setIsPlaying(false);
       }
     },
-    [playbackSpeed]
+    [playbackSpeed, token]
   );
 
   useEffect(() => {
@@ -231,4 +210,4 @@ function Flashcard({ flashcard, onCorrect, onIncorrect, languageMode, currentUse
   );
 }
 
-export default Flashcard;
+export default React.memo(Flashcard);

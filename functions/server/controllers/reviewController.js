@@ -1,119 +1,45 @@
 const admin = require('firebase-admin');
 
-// Check if Firebase app is already initialized
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-
+// Use admin.firestore() to access Firestore
 const db = admin.firestore();
 
-const MIN_REVIEW_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-const postReview = async (req, res) => {
+const submitReview = async (req, res) => {
   try {
-    const { firebaseUid, flashcardId, performanceRating } = req.body;
-    console.log('Received review request:', req.body);
-
-    const learningProgressRef = db.collection('LearningProgress').doc(`${firebaseUid}_${flashcardId}`);
-    const learningProgressSnap = await learningProgressRef.get();
-
-    if (!learningProgressSnap.exists) {
-      return res.status(404).json({
-        error: `Learning progress not found for user with ID ${firebaseUid} and flashcard with ID ${flashcardId}.`,
-      });
-    }
-
-    const learningProgress = learningProgressSnap.data();
-    const now = admin.firestore.Timestamp.now();
-
-    // Check if the card is due for review
-    if (learningProgress.nextReviewDate > now) {
-      const timeUntilDue = learningProgress.nextReviewDate.toDate() - now.toDate();
-      if (timeUntilDue > MIN_REVIEW_INTERVAL) {
-        return res.status(400).json({
-          error: 'This card is not due for review yet.',
-          nextReviewDate: learningProgress.nextReviewDate.toDate()
-        });
-      }
-    }
-
-    // Set quality of recall based on performance rating
-    let qualityOfRecall;
-    switch (performanceRating) {
-      case 'correct':
-        qualityOfRecall = 5; // Full recall
-        break;
-      case 'incorrect':
-        qualityOfRecall = 0; // No recall
-        break;
-      default:
-        return res.status(400).json({ error: 'Invalid performanceRating. Must be "correct" or "incorrect".' });
-    }
-
-    // Increment the review count
-    learningProgress.reviewCount += 1;
-
-    // Update the ease factor (SuperMemo algorithm logic)
-    const newEaseFactor = learningProgress.easeFactor + 0.1 - (5 - qualityOfRecall) * (0.08 + (5 - qualityOfRecall) * 0.02);
-    learningProgress.easeFactor = Math.max(1.3, Number(newEaseFactor.toFixed(4)));
-
-    // Determine the new interval based on the review count
-    if (learningProgress.reviewCount === 1) {
-      learningProgress.interval = 1;
-    } else if (learningProgress.reviewCount === 2) {
-      learningProgress.interval = 6;
-    } else {
-      learningProgress.interval = Math.max(1, Math.round(learningProgress.interval * learningProgress.easeFactor));
-    }
-
-    // Update the next review date
-    const nextReviewDate = new Date(now.toDate());
-    nextReviewDate.setDate(nextReviewDate.getDate() + Math.max(1, learningProgress.interval));
-    learningProgress.nextReviewDate = admin.firestore.Timestamp.fromDate(nextReviewDate);
-    await learningProgressRef.update(learningProgress);
-
-    console.log(`Updated learning progress for card ${flashcardId}:`, {
-      nextReviewDate: learningProgress.nextReviewDate.toDate(),
-      interval: learningProgress.interval,
-      easeFactor: learningProgress.easeFactor,
-      reviewCount: learningProgress.reviewCount
+    const { userId, flashcardId, performanceRating } = req.body;
+    
+    // Your existing logic to save the review
+    // For example:
+    const reviewRef = await db.collection('Reviews').add({
+      userId,
+      flashcardId,
+      performanceRating,
+      timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    let updatedScore;
-    if (performanceRating === 'correct') {
-      const userRef = db.collection('Users').doc(firebaseUid);
-      const userDoc = await userRef.get();
-      
+    // Update the score
+    const scoreIncrement = performanceRating === 'correct' ? 1 : 0;
+    const userRef = db.collection('Users').doc(userId);
+    
+    const updatedScore = await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
       if (!userDoc.exists) {
-        return res.status(404).json({
-          error: `User not found with ID ${firebaseUid}.`,
-        });
+        throw new Error(`User with ID ${userId} not found.`);
       }
-
       const userData = userDoc.data();
-      updatedScore = (userData.score || 0) + 1;
-
-      await userRef.update({
-        score: updatedScore
-      });
-
-      console.log(`Updated score for user ${firebaseUid}: ${updatedScore}`);
-    }
+      const newScore = (userData.score || 0) + scoreIncrement;
+      transaction.update(userRef, { score: newScore });
+      return newScore;
+    });
 
     res.json({
-      message: 'Review saved successfully.',
-      learningProgress,
+      message: 'Review submitted successfully',
+      reviewId: reviewRef.id,  // Use the actual review ID
       updatedScore
     });
   } catch (error) {
-    console.error('Error in postReview:', error);
-    res.status(500).json({
-      error: 'An error occurred while trying to save the review.',
-      details: error.message
-    });
+    console.error('Error submitting review:', error);
+    res.status(500).json({ error: 'Failed to submit review', details: error.message });
   }
 };
 
-module.exports = {
-  postReview
-};
+module.exports = { submitReview };

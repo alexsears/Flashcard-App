@@ -1,32 +1,21 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { app } from './firebaseConfig';
 import bookImage from './book.jpg';
 
-const API_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001'; 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+
+console.log('Current API_URL:', API_URL);
 
 function FirebaseAuth() {
+  console.log(`${new Date().toISOString()} - Rendering FirebaseAuth`);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const auth = getAuth(app);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const auth = getAuth();
 
   const clearError = () => setError(null);
-
-  const validateInput = (email, password) => {
-    if (!email || !password) {
-      setError('Email and password are required');
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Invalid email format');
-      return false;
-    }
-    if (password.length < 6) {
-      setError('Password should be at least 6 characters long');
-      return false;
-    }
-    return true;
-  };
 
   const refreshToken = async () => {
     try {
@@ -41,7 +30,51 @@ function FirebaseAuth() {
       setError('Failed to refresh the token. Please try signing in again.');
     }
   };
-  
+
+  const onSignInSuccess = useCallback(async (userCredential, isNewUser) => {
+    const user = userCredential.user;
+    const endpoint = '/login'; // Always use login endpoint
+
+    try {
+      console.log(`${new Date().toISOString()} - User signed in, refreshing token`);
+      await refreshToken();
+      const token = await user.getIdToken();
+      console.log(`${new Date().toISOString()} - Token refreshed, sending request to ${endpoint}`);
+      const response = await fetch(`${API_URL}${endpoint}`, { 
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ token }),
+      });
+
+      console.log('Before login attempt');
+      // Your login logic here
+      console.log('After login attempt, response:', response);
+      console.log('Current state - isLoggedIn:', isLoggedIn, 'userData:', userData);
+
+      if (!response.ok) throw new Error('Failed to sign up or log in on the server.');
+      
+      const data = await response.json();
+      console.log(`${new Date().toISOString()} - Server response:`, data);
+
+      setUserData(data.user);
+      setIsLoggedIn(true);
+
+      console.log(`${new Date().toISOString()} - Login successful, user data:`, data.user);
+
+      if (data.user.role === 'manager') {
+        const newUrl = `${window.location.origin}/manager-console`;
+        window.open(newUrl, '_blank');
+      }
+    } catch (error) {
+      console.error(`${new Date().toISOString()} - Error during server signup or log in:`, error);
+      setError('Failed to complete login process. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [refreshToken]);
 
   const handleSignUp = useCallback(async (event) => {
     event.preventDefault();
@@ -54,7 +87,6 @@ function FirebaseAuth() {
       setLoading(false);
       return;
     }
-    
 
     try {
       await signInWithEmailAndPassword(auth, email.value, password.value)
@@ -72,15 +104,15 @@ function FirebaseAuth() {
         } catch (error) {
           console.error(error);
           setError(`Error signing up: ${error.message}`);
+          setLoading(false);
         }
       } else {
         console.error(error);
         setError(`Error signing in: ${error.message}`);
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
     }
-  }, [auth]);
+  }, [auth, onSignInSuccess]);
 
   const handleGoogleSignIn = useCallback(async () => {
     clearError();
@@ -93,63 +125,28 @@ function FirebaseAuth() {
     } catch (error) {
       console.error(error);
       setError(`Error signing in with Google: ${error.message}`);
-    } finally {
       setLoading(false);
     }
-  }, [auth]);
+  }, [auth, onSignInSuccess]);
 
-  const onSignInSuccess = useCallback(async (userCredential, isNewUser) => {
-    const user = userCredential.user;
-    const endpoint = isNewUser ? '/api/signup' : '/api/login';
-  
-    try {
-      console.log(`${new Date().toISOString()} - User signed in, refreshing token`);
-      await refreshToken();
-      const token = await user.getIdToken();
-      console.log(`${new Date().toISOString()} - Token refreshed, sending request to ${endpoint}`);
-      const response = await fetch(`${API_URL}${endpoint}`, { 
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ 
-          uid: user.uid,
-          email: user.email
-        }),
-      });
-  
-      if (!response.ok) throw new Error('Failed to sign up or log in on the server.');
-      
-      const data = await response.json();
-      console.log(`${new Date().toISOString()} - Server response:`, data);
-  
-      if (data.user && data.user.score !== undefined) {
-        console.log(`${new Date().toISOString()} - User ${user.uid} logged in with score: ${data.user.score}`);
-      } else {
-        console.log(`${new Date().toISOString()} - User ${user.uid} logged in, but score was not in the response`);
-      }
-  
-      console.log(`${new Date().toISOString()} - Fetching additional user data`);
-      const userResponse = await fetch(`${API_URL}/api/user/${user.uid}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        console.log(`${new Date().toISOString()} - User data from /api/user/:uid:`, userData);
-        console.log(`${new Date().toISOString()} - User role: ${userData.role}`);
-        if (userData.role === 'manager') {
-          const newUrl = `${window.location.origin}/manager-console`;
-          window.open(newUrl, '_blank');
-        }
-      }
-    } catch (error) {
-      console.error(`${new Date().toISOString()} - Error during server signup or log in:`, error);
-      setError('Failed to complete login process. Please try again.');
-    }
-  }, []);
-  
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    console.log('Login attempt started');
+    // Your login logic here
+    console.log('Login attempt completed');
+  };
+
+  if (isLoggedIn && userData) {
+    return (
+      <div>
+        <h2>Welcome, {userData.email}</h2>
+        <p>Your role: {userData.role}</p>
+        <p>Score: {userData.score}</p>
+        <p>Due cards: {userData.dueCards}</p>
+        {/* Render additional user information or components here */}
+      </div>
+    );
+  }
 
   return (
     <div className="login-container">
@@ -177,27 +174,5 @@ function FirebaseAuth() {
     </div>
   );
 }
-
-const Input = ({ label, type, name }) => (
-  <label className="label">
-    {label}
-    <input 
-      name={name} 
-      type={type} 
-      placeholder={label} 
-      className="input" 
-    />
-  </label>
-);
-
-const Button = ({ children, type, onClick, className }) => (
-  <button 
-    type={type} 
-    onClick={onClick} 
-    className={`button ${className}`}
-  >
-    {children}
-  </button>
-);
 
 export default FirebaseAuth;

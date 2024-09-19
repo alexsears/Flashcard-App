@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { submitReview } = require('../controllers/reviewController');
 
 // Import controllers
 const userController = require('../controllers/userController');
@@ -12,6 +13,7 @@ const managerController = require('../controllers/managerController');
 // Import middleware
 const { authenticateFirebaseToken } = require('../middleware/FirebaseToken');
 const { authenticateManager } = require('../middleware/authenticateManager');
+const { authenticateUser } = require('../middleware/authenticateUser');
 
 // Middleware to log requests
 router.use((req, res, next) => {
@@ -19,19 +21,23 @@ router.use((req, res, next) => {
   next();
 });
 
-// User routes
+// Public routes
 router.post('/signup', userController.postSignup);
-router.post('/login', userController.postLogin);
+router.post('/login', userController.login);
+
+// Authenticated routes
+router.use(authenticateFirebaseToken); // Apply authentication to all routes below this line
+
+// User routes
 router.get('/user/:userId', userController.getUser);
 router.get('/learningprogress/:userId', userController.getLearningProgress);
-router.get('/learningprogressstats/:userId', authenticateManager, userController.getLearningProgressStats);
 
 // Flashcard routes
-router.get('/flashcards', validateFlashcardsQuery, flashcardController.getFlashcards);
+router.get('/flashcards', flashcardController.getFlashcards);
 router.get('/flashcard/:flashcardId', flashcardController.getFlashcard);
 
-// Review routes
-router.post('/review', reviewController.postReview);
+// Review route
+router.post('/review', reviewController.submitReview);
 
 // Score routes
 router.get('/score', scoreController.getScore);
@@ -41,11 +47,13 @@ router.get('/dueFlashcards/:uid', scoreController.getDueFlashcardsCount);
 // TTS routes
 router.post('/synthesize', ttsController.synthesizeSpeech);
 
-// Manager routes (with authentication middleware)
-router.get('/userStats', authenticateFirebaseToken, authenticateManager, managerController.getUserStats);
-router.get('/usageStats', authenticateFirebaseToken, authenticateManager, managerController.getUsageStats);
-router.get('/flashcardStats', authenticateFirebaseToken, authenticateManager, managerController.getFlashcardStats);
-router.get('/userProgress/:userId', authenticateFirebaseToken, authenticateManager, managerController.getUserProgressOverTime);
+// Manager routes (with additional manager authentication)
+router.use('/manager', authenticateManager); // Apply manager authentication to all manager routes
+router.get('/manager', authenticateManager, managerController.openManagerConsole);
+router.get('/manager/userStats', managerController.getUserStats);
+router.get('/flashcardStats', managerController.getFlashcardStats);
+router.get('/userProgress/:userId', managerController.getUserProgressOverTime);
+router.get('/learningprogressstats/:userId', userController.getLearningProgressStats);
 
 // Middleware for flashcards query validation
 function validateFlashcardsQuery(req, res, next) {
@@ -65,5 +73,27 @@ router.use((err, req, res, next) => {
 router.all('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
+
+// Define your routes here
+router.get('/example', (req, res) => {
+  res.json({ message: 'Example route' });
+});
+
+// New score endpoint
+router.get('/api/user/score', authenticateFirebaseToken, scoreController.getUserScore);
+
+// New route for text-to-speech functionality
+router.post('/api/synthesize-speech', ttsController.synthesizeSpeech);
+
+// Manager console route
+router.get('/manager', authenticateManager, managerController.openManagerConsole);
+
+// Route for checking manager status
+router.get('/check-manager-status', authenticateManager, (req, res) => {
+  res.json({ isManager: true });
+});
+
+// Route for individual flashcards
+router.get('/flashcard/:id', flashcardController.getFlashcard);
 
 module.exports = router;

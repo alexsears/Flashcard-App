@@ -21,16 +21,16 @@ function TopBar({ languageMode, onLanguageChange, score, onLogout }) {
 
       <div className="right-section">
         <div 
-        className="language-toggle-switch" 
-        onClick={handleLanguageToggle}
-        role="switch" 
-        aria-checked={languageMode === 'english'}
-        aria-label={languageMode === 'english' ? "Switch to Thai" : "Switch to English"}
-      >
-        <img src={usaFlag} alt="English" className="flag-icon usa-flag" title="Switch to English" />
-        <div className={`toggle-slider ${languageMode === 'english' ? 'english-mode' : 'thai-mode'}`}></div>
-        <img src={thaiFlag} alt="Thai" className="flag-icon thai-flag" title="Switch to Thai" />
-      </div>
+          className="language-toggle-switch" 
+          onClick={handleLanguageToggle}
+          role="switch" 
+          aria-checked={languageMode === 'english'}
+          aria-label={languageMode === 'english' ? "Switch to Thai" : "Switch to English"}
+        >
+          <img src={usaFlag} alt="English" className="flag-icon usa-flag" title="Switch to English" />
+          <div className={`toggle-slider ${languageMode === 'english' ? 'english-mode' : 'thai-mode'}`}></div>
+          <img src={thaiFlag} alt="Thai" className="flag-icon thai-flag" title="Switch to Thai" />
+        </div>
         <div className="score-container">
           <span>Score: </span>
           <div className="digital-counter">

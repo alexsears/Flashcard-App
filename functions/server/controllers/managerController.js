@@ -1,17 +1,10 @@
 const admin = require('firebase-admin');
-const path = require('path');
-
-const serviceAccountPath = path.join(__dirname, '..', 'pootcuppeelek-316a576ed35c.json');
-const serviceAccount = require(serviceAccountPath);
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://pootcuppeelek.firebaseio.com'
-  });
-}
 
 const db = admin.firestore();
+
+exports.openManagerConsole = (req, res) => {
+  res.json({ message: 'Manager console accessed successfully' });
+};
 
 exports.getUserStats = async (req, res) => {
   try {
@@ -26,18 +19,15 @@ exports.getUserStats = async (req, res) => {
 
     const inactiveUsers = totalUsers - activeUsers;
 
-    const emailAddresses = usersSnap.docs.map(doc => doc.data().email);
-
     res.json({
       totalUsers,
       activeUsers,
-      inactiveUsers,
-      emailAddresses,
+      inactiveUsers
     });
   } catch (error) {
     console.error('Error in getUserStats:', error);
     res.status(500).json({
-      error: 'An error occurred while trying to get user stats.',
+      error: 'An error occurred while trying to get user stats.'
     });
   }
 };

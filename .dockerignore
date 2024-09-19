@@ -1,8 +1,14 @@
-# node_modules
-# server/node_modules
+# Files and directories to ignore
+node_modules
+server/node_modules
 npm-debug.log
 .git
 .gitignore
-#.env
-# Ignore docker-compose file
 docker-compose.yml
+
+# Don't ignore these files
+!.env
+!config-overrides.js
+
+# Ensure build directory is not ignored
+!build

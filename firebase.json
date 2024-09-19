@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist",
+    "public": "build",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -18,7 +18,11 @@
     ]
   },
   "functions": {
-    "source": "functions"
+    "source": "functions",
+    "runtime": "nodejs14",
+    "environmentVariables": {
+      "GOOGLE_CLOUD_PROJECT": "pootcuppeelek"
+    }
   },
   "firestore": {
     "rules": "firestore.rules",
